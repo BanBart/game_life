@@ -1,0 +1,153 @@
+<h1>Gra w życie</h1>
+
+
+<script type="text/javascript"><!--
+
+window.onload = function() {
+     wyczysc(); 
+     stanpocz();
+};
+    
+  var w=15;
+  var k=15;
+  var ile=w*k;
+
+  var s=new Array(2)
+  s[0]=new Array(ile)
+  s[1]=new Array(ile)
+
+  var akt=0;
+  var nowa=1;
+  var auto=0;
+
+function wyczysc()
+{
+  window.status="Czekaj...";
+  for (i=0; i<ile; i++)
+  {
+    s[nowa][i]=0;
+  }
+  if (akt==0) { akt=1; nowa=0; } else { akt=0; nowa=1; }
+  window.status="";
+}
+
+function zmien(nr)
+{
+  s[akt][nr]=(s[akt][nr]==0)?1:0;
+  document.images[nr].src=((s[akt][nr]==1)?"alive.png":"dead.png");
+}
+
+function pokaz()
+{
+  for(i=0; i<ile; i++)
+  {
+    if (s[0][i]!=s[1][i])
+    {
+      document.images[i].src=((s[akt][i]==1)?"alive.png":"dead.png");
+    }
+  }
+}
+
+function zywy(nr)
+{
+  return(s[akt][nr]);
+}
+
+function zliczsasiadow(nr)
+{
+  var cw=Math.floor(nr/k);
+  var ck=nr % k;
+  var g=cw>0;
+  var d=cw<(w-1);
+  var l=ck>0;
+  var p=ck<(k-1);
+  return((g?zywy(nr-k):0)+(d?zywy(nr+k):0)+(l?zywy(nr-1):0)+(p?zywy(nr+1):0)+
+    ((g&&l)?zywy(nr-k-1):0)+((g&&p)?zywy(nr-k+1):0)+((d&&l)?zywy(nr+k-1):0)+
+    ((d&&p)?zywy(nr+k+1):0));
+}
+
+function ruch(cc)
+{
+  window.status="Czekaj...";
+  for(c=0; c<cc; c++)
+  {
+    for (i=0; i<ile; i++)
+    {
+      if (zywy(i))
+      {
+        iles=zliczsasiadow(i);
+	s[nowa][i]=((iles==2) || (iles==3))?1:0;
+      }
+      else
+      {
+        s[nowa][i]=(zliczsasiadow(i)==3)?1:0;
+      }
+    }
+    if (akt==0) { akt=1; nowa=0; } else { akt=0; nowa=1; }
+    pokaz();
+  }
+  window.status="";
+}
+    
+function stanpocz()
+{
+  zmien(1); zmien(2+k); zmien(2*k); zmien(2*k+1); zmien(2*k+2);
+}
+
+function pokazop()
+{
+  if (auto==1)
+  {
+    ruch(1);
+    setTimeout("pokazop();",document.getElementsByName("interval")[0].value);
+  }
+}
+
+function autopokaz()
+{
+  if (auto==0)
+  {
+    auto=1; pokazop(); document.getElementsByName("autop")[0].value="Wstrzymaj ";
+  }
+  else
+  {
+     auto=0; document.getElementsByName("autop")[0].value="Rozpocznij";
+  }
+}
+//--></script>
+
+<form id="control" action="">
+<p class="center">
+<input type="button" value="Przywróć stan początkowy" onclick="wyczysc(); pokaz(); stanpocz();"/>&nbsp;&nbsp;
+<input type="button" value="Wyczyść" onclick="wyczysc(); pokaz();"/>
+</p>
+
+<script type="text/javascript"><!--
+document.write("<table style=\"margin-left: auto; margin-right: auto; margin-top: 15px\" cellspacing=\"0\" cellpadding=\"0\">");
+for (i=0; i<w; i++)
+{
+  document.write("<tr>");
+  for (j=0; j<k; j++)
+  {
+      
+    document.write("<td><a href='javascript:zmien("+(k*i+j)+");'><img "+
+      "src='dead.png' border='0' width='20' height='20'></a></td>");
+    
+  }
+  document.write("</tr>");
+}
+document.write("</table>");
+//--></script>
+
+<p class="center">
+<input type="button" name="autop" value="Rozpocznij" onclick="autopokaz();"/>
+pokaz z interwałem między ruchami
+<select name="interval">
+    
+<option value="500">pół sekundy</option>
+<option value="1000" selected="selected">1 sekunda</option>
+
+</select>
+</p>
+
+</form>
